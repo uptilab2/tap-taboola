@@ -18,6 +18,10 @@ campaign = {
             'type': 'string',
             'description': 'i.e. taboola-track',
         },
+        'cpc_total': {
+            'type': 'number',
+            'description': 'Cost per click for the whole campaign, i.e. 0.25',
+        },
         'daily_cap': {
             'type': 'number',
             'description': 'i.e. 100',

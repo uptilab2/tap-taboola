@@ -156,6 +156,7 @@ def parse_campaign(campaign):
         'name': str(campaign.get('name', '')),
         'tracking_code': str(campaign.get('tracking_code', '')),
         'daily_cap': float(campaign.get('daily_cap', 0.0)),
+        'cpc_total': float(campaign.get('cpc', 0.0)),
         'spending_limit': float(campaign.get('spending_limit', 0.0)),
         'spending_limit_model': str(campaign.get('spending_limit_model', '')),
         'country_targeting': campaign.get('country_targeting'),
