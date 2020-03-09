@@ -187,18 +187,14 @@ def sync_campaigns(config, state, access_token, account_id):
     parsed_campaigns = {}
 
     for campaign in campaigns:
-        r = parse_campaign(campaign)
-        parsed_campaigns[r['id']] = r
-        LOGGER.info(r['id'])
+        cp = parse_campaign(campaign)
+        parsed_campaigns[cp['id']] = cp
 
     for performance in performances:
         parsed_performance = parse_campaign_performance(performance)
-        LOGGER.info(parsed_performance)
         if parsed_performance['campaign_id'] in parsed_campaigns:
-            LOGGER.info(parsed_campaigns[parsed_performance['campaign_id']])
             record = {**parsed_performance, **parsed_campaigns[parsed_performance['campaign_id']]}
             record.pop('campaign_id', None)
-            LOGGER.info(record)
             singer.write_record('campaigns',
                                 record,
                                 time_extracted=time_extracted)
@@ -219,6 +215,7 @@ def verify_account_access(access_token, account_id):
 
     LOGGER.info("Verified account access via token details endpoint.")
     return account_id
+
 
 def validate_config(config):
     required_keys = ['username', 'password', 'account_id',
@@ -294,7 +291,7 @@ def do_sync(args):
     config['account_id'] = verify_account_access(access_token, config.get('account_id'))
 
     sync_campaigns(config, state, access_token, config.get('account_id'))
-    
+
 
 def main_impl():
     parser = argparse.ArgumentParser()
