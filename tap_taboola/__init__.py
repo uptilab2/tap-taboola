@@ -184,7 +184,8 @@ def sync_campaigns(config, state, access_token, account_id):
     time_extracted = utils.now()
 
     LOGGER.info('Synced {} campaigns.'.format(len(campaigns)))
-    
+    LOGGER.info('Synced {} campaigns performances.'.format(len(performances)))
+
     parsed_campaigns = {}
 
     for campaign in campaigns:
