@@ -166,7 +166,7 @@ def parse_campaign(campaign):
         'end_date': str('9999-12-31' if end_date is None else end_date),
         'approval_state': str(campaign.get('approval_state', '')),
         'is_active': bool(campaign.get('is_active', False)),
-        'spent': float(campaign.get('spent', 0.0)),
+        'spent_total': float(campaign.get('spent', 0.0)),
         'status': str(campaign.get('status', '')),
     }
 

@@ -101,7 +101,7 @@ campaign = {
             'type': 'boolean',
             'description': 'Whether or not the campaign is active.',
         },
-        'spent': {
+        'spent_total': {
             'type': 'number',
             'description': 'i.e. 2.23',
         },
