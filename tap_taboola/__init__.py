@@ -146,26 +146,6 @@ def fetch_campaign_performance(config, state, access_token, account_id):
     campaign_performance = request(url, access_token, params)
     return campaign_performance.json().get('results')
 
-
-def sync_campaign_performance(config, state, access_token, account_id):
-    performance = fetch_campaign_performance(config, state, access_token,
-                                             account_id)
-
-    time_extracted = utils.now()
-
-    LOGGER.info("Got {} campaign performance records."
-                .format(len(performance)))
-
-    for record in performance:
-        parsed_performance = parse_campaign_performance(record)
-
-        singer.write_record('campaign_performance',
-                            parsed_performance,
-                            time_extracted=time_extracted)
-
-    LOGGER.info("Done syncing campaign_performance.")
-
-
 def parse_campaign(campaign):
     start_date = campaign.get('start_date')
     end_date = campaign.get('end_date')
@@ -175,7 +155,6 @@ def parse_campaign(campaign):
         'advertiser_id': str(campaign.get('advertiser_id', '')),
         'name': str(campaign.get('name', '')),
         'tracking_code': str(campaign.get('tracking_code', '')),
-        'cpc': float(campaign.get('cpc', 0.0)),
         'daily_cap': float(campaign.get('daily_cap', 0.0)),
         'spending_limit': float(campaign.get('spending_limit', 0.0)),
         'spending_limit_model': str(campaign.get('spending_limit_model', '')),
@@ -197,18 +176,32 @@ def fetch_campaigns(access_token, account_id):
     return response.json().get('results')
 
 
-def sync_campaigns(access_token, account_id):
+def sync_campaigns(config, state, access_token, account_id):
     campaigns = fetch_campaigns(access_token, account_id)
+    performances = fetch_campaign_performance(config, state, access_token,
+                                             account_id)
     time_extracted = utils.now()
 
     LOGGER.info('Synced {} campaigns.'.format(len(campaigns)))
+    
+    parsed_campaigns = {}
 
-    for record in campaigns:
-        parsed_campaigns = parse_campaign(record)
+    for campaign in campaigns:
+        r = parse_campaign(campaign)
+        parsed_campaigns[r['id']] = r
+        LOGGER.info(r['id'])
 
-        singer.write_record('campaigns',
-                            parsed_campaigns,
-                            time_extracted=time_extracted)
+    for performance in performances:
+        parsed_performance = parse_campaign_performance(performance)
+        LOGGER.info(parsed_performance)
+        if parsed_performance['campaign_id'] in parsed_campaigns:
+            LOGGER.info(parsed_campaigns[parsed_performance['campaign_id']])
+            record = {**parsed_performance, **parsed_campaigns[parsed_performance['campaign_id']]}
+            record.pop('campaign_id', None)
+            LOGGER.info(record)
+            singer.write_record('campaigns',
+                                record,
+                                time_extracted=time_extracted)
 
     LOGGER.info("Done syncing campaigns.")
 
@@ -298,15 +291,10 @@ def do_sync(args):
                         schemas.campaign,
                         key_properties=['id'])
 
-    singer.write_schema('campaign_performance',
-                        schemas.campaign_performance,
-                        key_properties=['campaign_id', 'date'])
-
     config['account_id'] = verify_account_access(access_token, config.get('account_id'))
 
-    sync_campaigns(access_token, config.get('account_id'))
-    sync_campaign_performance(config, state, access_token,
-                              config.get('account_id'))
+    sync_campaigns(config, state, access_token, config.get('account_id'))
+    
 
 def main_impl():
     parser = argparse.ArgumentParser()
