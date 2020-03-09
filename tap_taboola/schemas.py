@@ -18,7 +18,7 @@ campaign = {
             'type': 'string',
             'description': 'i.e. taboola-track',
         },
-        'cpc': {
+        'cpc_total': {
             'type': 'number',
             'description': 'Cost per click for the whole campaign, i.e. 0.25',
         },
@@ -34,7 +34,6 @@ campaign = {
             'type': 'string',
             'description': 'i.e. "MONTHLY"',
         },
-
         'country_targeting': {
             'type': ['object', 'null'],
             'description': ('Country codes to target. Type is like "INCLUDE", '
@@ -84,7 +83,6 @@ campaign = {
                 }
             }
         },
-
         'start_date': {
             'type': 'string',
             'format': 'date',
@@ -103,22 +101,13 @@ campaign = {
             'type': 'boolean',
             'description': 'Whether or not the campaign is active.',
         },
-        'spent': {
+        'spent_total': {
             'type': 'number',
             'description': 'i.e. 2.23',
         },
         'status': {
             'type': 'string',
             'description': 'i.e. "RUNNING"',
-        }
-    }
-}
-
-campaign_performance = {
-    'type': 'object',
-    'properties': {
-        'campaign_id': {
-            'type': 'integer',
         },
         'date': {
             'type': 'string',
@@ -168,3 +157,4 @@ campaign_performance = {
         }
     }
 }
+
